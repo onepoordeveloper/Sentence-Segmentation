@@ -1,3 +1,8 @@
 # Sentence-Segmentation
-A Chrome Extension which will segment each sentence based on the period.
-It is depending on another Chrome Extension "EasyReader" (https://chrome.google.com/webstore/detail/easyreader/boamfheepdiallipiieadpmnklbhadhc?hl=en)
+This extension will make your text easily readable by separating sentences based on periods.
+
+Taking every sentence to a new line will make the text a lot easily readable.
+
+Find on Chrome Store: https://chrome.google.com/webstore/detail/sentence-segmenter/jfbhkblbhhigbgdnijncccdndhbflcha
+
+Commissioned by Jeff Kang.
