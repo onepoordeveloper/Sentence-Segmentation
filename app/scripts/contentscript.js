@@ -1,23 +1,33 @@
 'use strict';
+var elem;
 $(document).ready(function() {
-  setInterval(function () {
-    filter();
-  }, 1000);
 
-  var filter = function () {
-    if ($("#readerDiv:not(.done)").length > 0) {
-      $("#readerDiv").addClass("done");
-    }
-    else{
-      return;
-    }
-    $("#readerDiv *").each(function () {
-      var v = $(this).html();
-      var regexForPeriod = /\.\s/g;
-      var regexForComma = /\,\s/g;
-      v = v.replace(regexForPeriod, ".<br/>");
-      //v = v.replace(regexForComma, ",<br/>");
-      $(this).html(v);
+    $("*").mouseenter(function (e) {
+        $(e.target).addClass("hoverActive");
+        $(e.target).parent().addClass("hoverActiveParent");
     });
-  }
+    $("*").mouseleave(function () {
+        $(".hoverActive").removeClass("hoverActive");
+        $(".hoverActiveParent").removeClass("hoverActiveParent");
+    });
+
+    $(document).mousedown(function (e) {
+        $(".hoverActiveParent").attr("id", "pickMe");
+    });
 });
+
+var segmentSection = function(which){
+    if (which == "section") elem = "#pickMe";
+    else elem = "body";
+    $(elem + " *").each(function(){
+        var v = $(this).html();
+        var regexForPeriod = /\.\s/g;       //regex to find period
+        var regexForQuestion = /\?\s/g;     //regex to find question mark
+        v = v.replace(regexForPeriod, ".<br/>");        //replacing period with period and newline
+        v = v.replace(regexForQuestion, "?<br/>");      //replacing questionmark with questionmark and newline
+        $(this).html(v);        //adding replaced content back to the DOM element
+    });
+    $("#pickMe").attr("id","");
+};
+
+

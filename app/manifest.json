@@ -3,7 +3,7 @@
   "short_name": "Sentence Segmenter",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "This extension will make your text readable by separating sentences based on periods.",
+  "description": "This extension will make your text easily readable by separating sentences based on periods.",
   "icons": {
     "16": "images/icon-16.png",
     "128": "images/icon-128.png"
@@ -11,8 +11,14 @@
   "default_locale": "en",
   "permissions": [
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "contextMenus"
   ],
+  "background": {
+    "scripts": [
+      "scripts/background.js"
+    ]
+  },
   "content_scripts": [
     {
       "matches": [
@@ -22,6 +28,9 @@
       "js": [
         "scripts/script.js",
         "scripts/contentscript.js"
+      ],
+      "css":[
+        "styles/main.css"
       ],
       "run_at": "document_end",
       "all_frames": false
