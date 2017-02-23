@@ -1,12 +1,13 @@
-.hoverActiveParent{
-    /*outline: 3px solid yellow !important;*/
+.hoverActiveParent.border{
+    outline: 3px solid yellow !important;
 }
 
 #SentenceSegmentationPopup{
     width:250px;
-
 }
 
-p {
-    border-bottom: 1px solid rgba(255,0,0,0.7) !important;
+.segmentSeparator{
+    background: none !important;
+    height:6px !important;
+    margin: 0 !important;
 }

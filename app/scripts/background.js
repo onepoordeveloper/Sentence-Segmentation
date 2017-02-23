@@ -2,6 +2,7 @@ chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
     chrome.storage.local.set({'switch': "On"});
     chrome.storage.local.set({'autoSegmentSwitch': "Off"});
+    chrome.storage.local.set({'paraBorder': "On"});
 });
 
 
@@ -23,6 +24,7 @@ chrome.contextMenus.onClicked.addListener(onClickHandler);
 
 var mainSwitch = "";
 var autoSegmentSwitch = "";
+var paraBorder = "";
 var getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
@@ -42,11 +44,19 @@ var getAutoSegment = function(){
         console.log(resp.autoSegmentSwitch);
         autoSegmentSwitch = resp.autoSegmentSwitch;
     });
-}
+};
+
+var getParaBorder = function(){
+    chrome.storage.local.get(null, function(resp){
+        console.log(resp.paraBorder);
+        paraBorder = resp.paraBorder;
+    });
+};
 
 setTimeout(function(){
     getStatus();
     getAutoSegment();
+    getParaBorder();
 },500);
 
 chrome.runtime.onMessage.addListener(
@@ -91,8 +101,31 @@ chrome.runtime.onMessage.addListener(
                 getAutoSegment();
             }
         }
+        if (request.method == "paraBorder") {
+            if (request.value == true){
+                //turn off the extension.. set flag to off
+                chrome.storage.local.set({'paraBorder': "Off"});
+                sendResponse({message: "paraBorder turned Off"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getParaBorder();
+            }
+            else{
+                //turn on the extension
+                chrome.storage.local.set({'paraBorder': "On"});
+                sendResponse({message: "paraBorder turned On"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getParaBorder();
+            }
+        }
         else if (request.method == "getStatus"){
             sendResponse({message: mainSwitch});
+        }
+        else if (request.method == "getParaBorder"){
+            sendResponse({message: paraBorder});
         }
         else if (request.method == "getAutoSegment"){
             sendResponse({message: autoSegmentSwitch});

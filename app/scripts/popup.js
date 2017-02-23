@@ -15,11 +15,24 @@ $(document).ready(function(){
             $("#autoSegment").prop('checked', true);
         }
     });
+    chrome.runtime.sendMessage({method: "getParaBorder"}, function(response) {
+        if (response.message == "Off"){
+            $("#paragraphBorder").prop('checked', true);
+        }
+        else if (response.message == "On"){
+            $("#paragraphBorder").prop('checked', false);
+        }
+    });
     $("#mainSwitch").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "turnOff", value: current}, function(response) {
         });
-    })
+    });
+    $("#paragraphBorder").change(function(){
+        var current = $(this).prop('checked');
+        chrome.runtime.sendMessage({method: "paraBorder", value: current}, function(response) {
+        });
+    });
     $("#autoSegment").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "autoSegment", value: current}, function(response) {
