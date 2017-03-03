@@ -11,3 +11,33 @@
     height:6px !important;
     margin: 0 !important;
 }
+
+#SentenceSegmentationPopup label span{
+    font-size: 14px;
+    vertical-align: super;
+}
+
+#SentenceSegmentationPopup label input[type="checkbox"]{
+    height: 20px;
+    width:20px;
+}
+
+#SentenceSegmentationPopup p {
+    text-align: center;
+}
+
+#SentenceSegmentationPopup label {
+    display: block;
+    transition: 0s;
+}
+
+#SentenceSegmentationPopup label:hover{
+    background: #666;
+    color: white;
+    transition: 0.3s;
+}
+
+#segmentThisPage{
+    width:100%;
+    padding: 10px 0;
+}

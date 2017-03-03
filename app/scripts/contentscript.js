@@ -1,8 +1,11 @@
 'use strict';
 var elem;
+var lineSeparator;
 $(document).ready(function() {
     var work = true;
-    var border = true;
+    var border = false;
+    lineSeparator = true;
+
     //checking if switch is off
     chrome.runtime.sendMessage({method: "getStatus"}, function(response) {
         if (response.message == "Off"){
@@ -22,6 +25,7 @@ $(document).ready(function() {
         if (work == false) return;
         $(".hoverActive").removeClass("hoverActive");
         $(".hoverActiveParent").removeClass("hoverActiveParent");
+        $(".border").removeClass("border");
     });
 
     $(document).mousedown(function (e) {
@@ -45,6 +49,15 @@ $(document).ready(function() {
         }
     });
 
+    chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
+        if (response.message == "Off"){
+            lineSeparator = false;
+        }
+        else if (response.message == "On"){
+            lineSeparator = true;
+        }
+    });
+
 });
 
 var segmentSection = function(which){
@@ -54,8 +67,12 @@ var segmentSection = function(which){
         var v = $(this).html();
         var regexForPeriod = /\.\s/g;       //regex to find period
         var regexForQuestion = /\?\s/g;     //regex to find question mark
-        v = v.replace(regexForPeriod, ".<br/><hr class='segmentSeparator'>");        //replacing period with period and newline
-        v = v.replace(regexForQuestion, "?<br/><hr class='segmentSeparator'>");      //replacing questionmark with questionmark and newline
+        var lineBreak = ".<br/>";
+        var questionBreak = "?<br/>";
+        var separatorElem = "";
+        if (lineSeparator) separatorElem = "<hr class='segmentSeparator'>";
+        v = v.replace(regexForPeriod, (lineBreak + separatorElem));        //replacing period with period and newline
+        v = v.replace(regexForQuestion, (questionBreak + separatorElem));      //replacing questionmark with questionmark and newline
         $(this).html(v);        //adding replaced content back to the DOM element
     });
     $("#pickMe").attr("id","");

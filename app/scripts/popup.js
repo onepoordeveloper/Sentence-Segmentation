@@ -23,6 +23,14 @@ $(document).ready(function(){
             $("#paragraphBorder").prop('checked', false);
         }
     });
+    chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
+        if (response.message == "Off"){
+            $("#lineSeparator").prop('checked', true);
+        }
+        else if (response.message == "On"){
+            $("#lineSeparator").prop('checked', false);
+        }
+    });
     $("#mainSwitch").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "turnOff", value: current}, function(response) {
@@ -31,6 +39,11 @@ $(document).ready(function(){
     $("#paragraphBorder").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "paraBorder", value: current}, function(response) {
+        });
+    });
+    $("#lineSeparator").change(function(){
+        var current = $(this).prop('checked');
+        chrome.runtime.sendMessage({method: "lineSeparator", value: current}, function(response) {
         });
     });
     $("#autoSegment").change(function(){

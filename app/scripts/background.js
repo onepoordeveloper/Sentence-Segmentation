@@ -3,6 +3,7 @@ chrome.runtime.onInstalled.addListener(function() {
     chrome.storage.local.set({'switch': "On"});
     chrome.storage.local.set({'autoSegmentSwitch': "Off"});
     chrome.storage.local.set({'paraBorder': "On"});
+    chrome.storage.local.set({'lineSeparator': "On"});
 });
 
 
@@ -25,13 +26,14 @@ chrome.contextMenus.onClicked.addListener(onClickHandler);
 var mainSwitch = "";
 var autoSegmentSwitch = "";
 var paraBorder = "";
+var lineSeparator = "";
 var getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
         mainSwitch = resp.switch;
         if (mainSwitch == "On"){
-            chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
             chrome.contextMenus.create({"title": "Segment Complete Page", "id": "segmentPage"});
+            chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
         }
         else {
             chrome.contextMenus.removeAll();
@@ -52,11 +54,18 @@ var getParaBorder = function(){
         paraBorder = resp.paraBorder;
     });
 };
+var getLineSeparator = function(){
+    chrome.storage.local.get(null, function(resp){
+        console.log(resp.lineSeparator);
+        lineSeparator = resp.lineSeparator;
+    });
+};
 
 setTimeout(function(){
     getStatus();
     getAutoSegment();
     getParaBorder();
+    getLineSeparator();
 },500);
 
 chrome.runtime.onMessage.addListener(
@@ -103,7 +112,6 @@ chrome.runtime.onMessage.addListener(
         }
         if (request.method == "paraBorder") {
             if (request.value == true){
-                //turn off the extension.. set flag to off
                 chrome.storage.local.set({'paraBorder': "Off"});
                 sendResponse({message: "paraBorder turned Off"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -112,7 +120,6 @@ chrome.runtime.onMessage.addListener(
                 getParaBorder();
             }
             else{
-                //turn on the extension
                 chrome.storage.local.set({'paraBorder': "On"});
                 sendResponse({message: "paraBorder turned On"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -121,11 +128,32 @@ chrome.runtime.onMessage.addListener(
                 getParaBorder();
             }
         }
+        if (request.method == "lineSeparator") {
+            if (request.value == true){
+                chrome.storage.local.set({'lineSeparator': "Off"});
+                sendResponse({message: "LineSeparator turned Off"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getLineSeparator();
+            }
+            else{
+                chrome.storage.local.set({'lineSeparator': "On"});
+                sendResponse({message: "LineSeparator turned On"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getLineSeparator();
+            }
+        }
         else if (request.method == "getStatus"){
             sendResponse({message: mainSwitch});
         }
         else if (request.method == "getParaBorder"){
             sendResponse({message: paraBorder});
+        }
+        else if (request.method == "getLineSeparator"){
+            sendResponse({message: lineSeparator});
         }
         else if (request.method == "getAutoSegment"){
             sendResponse({message: autoSegmentSwitch});
