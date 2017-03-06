@@ -10,6 +10,12 @@
     background: none !important;
     height:6px !important;
     margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    border: none !important;
+}
+.segmentSeparator.sepBorder{
+    border-bottom: 1px solid #dedede !important;
 }
 
 #SentenceSegmentationPopup label span{

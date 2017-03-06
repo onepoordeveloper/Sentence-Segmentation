@@ -47,6 +47,9 @@ $(document).ready(function() {
             console.log("turned off");
             border = false;
         }
+        else{
+            border = true;
+        }
     });
 
     chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
@@ -69,8 +72,8 @@ var segmentSection = function(which){
         var regexForQuestion = /\?\s/g;     //regex to find question mark
         var lineBreak = ".<br/>";
         var questionBreak = "?<br/>";
-        var separatorElem = "";
-        if (lineSeparator) separatorElem = "<hr class='segmentSeparator'>";
+        var separatorElem = "<span class='segmentSeparator'></span>";
+        if (lineSeparator) separatorElem = "<span class='segmentSeparator sepBorder'></span>";
         v = v.replace(regexForPeriod, (lineBreak + separatorElem));        //replacing period with period and newline
         v = v.replace(regexForQuestion, (questionBreak + separatorElem));      //replacing questionmark with questionmark and newline
         $(this).html(v);        //adding replaced content back to the DOM element
