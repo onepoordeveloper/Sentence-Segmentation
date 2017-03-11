@@ -2,8 +2,8 @@ chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
     chrome.storage.local.set({'switch': "On"});
     chrome.storage.local.set({'autoSegmentSwitch': "Off"});
-    chrome.storage.local.set({'paraBorder': "On"});
-    chrome.storage.local.set({'lineSeparator': "On"});
+    chrome.storage.local.set({'paraBorder': "Off"});
+    chrome.storage.local.set({'lineSeparator': "Off"});
 });
 
 
@@ -112,7 +112,7 @@ chrome.runtime.onMessage.addListener(
         }
         if (request.method == "paraBorder") {
             if (request.value == true){
-                chrome.storage.local.set({'paraBorder': "Off"});
+                chrome.storage.local.set({'paraBorder': "On"});
                 sendResponse({message: "paraBorder turned Off"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
@@ -120,7 +120,7 @@ chrome.runtime.onMessage.addListener(
                 getParaBorder();
             }
             else{
-                chrome.storage.local.set({'paraBorder': "On"});
+                chrome.storage.local.set({'paraBorder': "Off"});
                 sendResponse({message: "paraBorder turned On"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
@@ -130,7 +130,7 @@ chrome.runtime.onMessage.addListener(
         }
         if (request.method == "lineSeparator") {
             if (request.value == true){
-                chrome.storage.local.set({'lineSeparator': "Off"});
+                chrome.storage.local.set({'lineSeparator': "On"});
                 sendResponse({message: "LineSeparator turned Off"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
@@ -138,7 +138,7 @@ chrome.runtime.onMessage.addListener(
                 getLineSeparator();
             }
             else{
-                chrome.storage.local.set({'lineSeparator': "On"});
+                chrome.storage.local.set({'lineSeparator': "Off"});
                 sendResponse({message: "LineSeparator turned On"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.update(tabs[0].id, {url: tabs[0].url});

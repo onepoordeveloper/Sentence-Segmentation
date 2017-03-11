@@ -17,18 +17,18 @@ $(document).ready(function(){
     });
     chrome.runtime.sendMessage({method: "getParaBorder"}, function(response) {
         if (response.message == "Off"){
-            $("#paragraphBorder").prop('checked', true);
+            $("#paragraphBorder").prop('checked', false);
         }
         else if (response.message == "On"){
-            $("#paragraphBorder").prop('checked', false);
+            $("#paragraphBorder").prop('checked', true);
         }
     });
     chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
         if (response.message == "Off"){
-            $("#lineSeparator").prop('checked', true);
+            $("#lineSeparator").prop('checked', false);
         }
         else if (response.message == "On"){
-            $("#lineSeparator").prop('checked', false);
+            $("#lineSeparator").prop('checked', true);
         }
     });
     $("#mainSwitch").change(function(){

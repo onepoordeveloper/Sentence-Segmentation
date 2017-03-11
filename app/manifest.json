@@ -1,7 +1,7 @@
 {
   "name": "Sentence Segmenter",
   "short_name": "Sentence Segmenter",
-  "version": "1.4",
+  "version": "1.5",
   "manifest_version": 2,
   "description": "This extension will make your text easily readable by separating sentences based on periods.",
   "icons": {
