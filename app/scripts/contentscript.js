@@ -11,24 +11,25 @@ $(document).ready(function() {
         if (response.message == "Off"){
             console.log("turned off");
             work = false;
+			$("body").addClass("work");
         }
     });
 
-    $("*").mouseenter(function (e) {
+    $("body.work *").mouseenter(function (e) {
         if (work == false) return;
         $(e.target).addClass("hoverActive");
         $(e.target).parent().addClass("hoverActiveParent");
         if (border == true) $(e.target).parent().addClass("border");
 
     });
-    $("*").mouseleave(function () {
+    $("body.work *").mouseleave(function () {
         if (work == false) return;
         $(".hoverActive").removeClass("hoverActive");
         $(".hoverActiveParent").removeClass("hoverActiveParent");
         $(".border").removeClass("border");
     });
 
-    $(document).mousedown(function (e) {
+    $("body.work").mousedown(function (e) {
         if (work == false) return;
         $(".hoverActiveParent").attr("id", "pickMe");
     });
@@ -44,7 +45,7 @@ $(document).ready(function() {
     chrome.runtime.sendMessage({method: "getParaBorder"}, function(response) {
 
         if (response.message == "Off"){
-            console.log("turned off");
+            console.log("border turned off");
             border = false;
         }
         else{

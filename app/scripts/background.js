@@ -1,3 +1,5 @@
+
+
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
     chrome.storage.local.set({'switch': "On"});
@@ -31,13 +33,14 @@ var getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
         mainSwitch = resp.switch;
-        if (mainSwitch == "On"){
+        //if (mainSwitch == "On"){
             chrome.contextMenus.create({"title": "Segment Complete Page", "id": "segmentPage"});
             chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
-        }
-        else {
-            chrome.contextMenus.removeAll();
-        }
+        //}
+        //else {
+        //    chrome.contextMenus.removeAll();
+        //}
+		//
     });
 }
 
@@ -163,4 +166,10 @@ chrome.runtime.onMessage.addListener(
                 code: "segmentSection('body');"
             });
         }
+    });
+
+    chrome.browserAction.onClicked.addListener(function(tab) {
+        chrome.tabs.executeScript(null, {
+            code: "segmentSection('body');"
+        });
     });
