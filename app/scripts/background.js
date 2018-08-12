@@ -35,7 +35,7 @@ var getStatus = function(){
         mainSwitch = resp.switch;
         //if (mainSwitch == "On"){
             chrome.contextMenus.create({"title": "Segment Complete Page", "id": "segmentPage"});
-            chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
+            //chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
         //}
         //else {
         //    chrome.contextMenus.removeAll();
