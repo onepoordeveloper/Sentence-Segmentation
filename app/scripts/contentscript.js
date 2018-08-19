@@ -1,10 +1,12 @@
 'use strict';
 var elem;
 var lineSeparator;
+var doubleSpace;
 $(document).ready(function() {
     var work = true;
     var border = false;
     lineSeparator = true;
+    doubleSpace = false;
 
     //checking if switch is off
     chrome.runtime.sendMessage({method: "getStatus"}, function(response) {
@@ -53,6 +55,17 @@ $(document).ready(function() {
         }
     });
 
+    chrome.runtime.sendMessage({method: "getDoubleSpace"}, function(response) {
+
+        if (response.message == "On"){
+            console.log("border turned On");
+            doubleSpace = true;
+        }
+        else{
+            doubleSpace = false;
+        }
+    });
+
     chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
         if (response.message == "Off"){
             lineSeparator = false;
@@ -71,9 +84,9 @@ var segmentSection = function(which){
         var v = $(this).html();
         var regexForPeriod = /\.\s/g;       //regex to find period
         var regexForQuestion = /\?\s/g;     //regex to find question mark
-        var lineBreak = ".<br/>";
+        var lineBreak = doubleSpace?".&nbsp;&nbsp;":".<br/>";
         var questionBreak = "?<br/>";
-        var separatorElem = "<span class='segmentSeparator'></span>";
+        var separatorElem = doubleSpace?"":"<span class='segmentSeparator'></span>";
         if (lineSeparator) separatorElem = "<span class='segmentSeparator sepBorder'></span>";
         v = v.replace(regexForPeriod, (lineBreak + separatorElem));        //replacing period with period and newline
         v = v.replace(regexForQuestion, (questionBreak + separatorElem));      //replacing questionmark with questionmark and newline

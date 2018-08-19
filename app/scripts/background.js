@@ -6,6 +6,8 @@ chrome.runtime.onInstalled.addListener(function() {
     chrome.storage.local.set({'autoSegmentSwitch': "Off"});
     chrome.storage.local.set({'paraBorder': "Off"});
     chrome.storage.local.set({'lineSeparator': "Off"});
+    chrome.storage.local.set({'doubleSpace': "Off"});
+
 });
 
 
@@ -29,6 +31,7 @@ var mainSwitch = "";
 var autoSegmentSwitch = "";
 var paraBorder = "";
 var lineSeparator = "";
+var doubleSpace = "";
 var getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
@@ -57,6 +60,12 @@ var getParaBorder = function(){
         paraBorder = resp.paraBorder;
     });
 };
+var getDoubleSpace = function(){
+    chrome.storage.local.get(null, function(resp){
+        console.log(resp.doubleSpace);
+        doubleSpace = resp.doubleSpace;
+    });
+};
 var getLineSeparator = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.lineSeparator);
@@ -69,6 +78,7 @@ setTimeout(function(){
     getAutoSegment();
     getParaBorder();
     getLineSeparator();
+    getDoubleSpace();
 },500);
 
 chrome.runtime.onMessage.addListener(
@@ -131,6 +141,24 @@ chrome.runtime.onMessage.addListener(
                 getParaBorder();
             }
         }
+        if (request.method == "doubleSpace") {
+            if (request.value == true){
+                chrome.storage.local.set({'doubleSpace': "On"});
+                sendResponse({message: "doubleSpace turned On"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getDoubleSpace();
+            }
+            else{
+                chrome.storage.local.set({'doubleSpace': "Off"});
+                sendResponse({message: "doubleSpace turned Off"});
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+                });
+                getDoubleSpace();
+            }
+        }
         if (request.method == "lineSeparator") {
             if (request.value == true){
                 chrome.storage.local.set({'lineSeparator': "On"});
@@ -154,6 +182,9 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.method == "getParaBorder"){
             sendResponse({message: paraBorder});
+        }
+        else if (request.method == "getDoubleSpace"){
+            sendResponse({message: doubleSpace});
         }
         else if (request.method == "getLineSeparator"){
             sendResponse({message: lineSeparator});
