@@ -13,7 +13,7 @@ chrome.runtime.onInstalled.addListener(function() {
 
 
 function onClickHandler(info, tab) {
-    if (info.menuItemId == "segmentSection") {
+    if (info.menuItemId === "segmentSection") {
         chrome.tabs.executeScript(tab.id, {
             code: "segmentSection('section');"
         });
@@ -32,11 +32,11 @@ var autoSegmentSwitch = "";
 var paraBorder = "";
 var lineSeparator = "";
 var doubleSpace = "";
-var getStatus = function(){
+const getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
         mainSwitch = resp.switch;
-        //if (mainSwitch == "On"){
+        //if (mainSwitch === "On"){
             chrome.contextMenus.create({"title": "Segment Complete Page", "id": "segmentPage"});
             //chrome.contextMenus.create({"title": "Segment This Section", "id": "segmentSection"});
         //}
@@ -47,26 +47,26 @@ var getStatus = function(){
     });
 }
 
-var getAutoSegment = function(){
+const getAutoSegment = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.autoSegmentSwitch);
         autoSegmentSwitch = resp.autoSegmentSwitch;
     });
 };
 
-var getParaBorder = function(){
+const getParaBorder = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.paraBorder);
         paraBorder = resp.paraBorder;
     });
 };
-var getDoubleSpace = function(){
+const getDoubleSpace = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.doubleSpace);
         doubleSpace = resp.doubleSpace;
     });
 };
-var getLineSeparator = function(){
+const getLineSeparator = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.lineSeparator);
         lineSeparator = resp.lineSeparator;
@@ -83,8 +83,8 @@ setTimeout(function(){
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-        if (request.method == "turnOff") {
-            if (request.value == true){
+        if (request.method === "turnOff") {
+            if (request.value){
                 //turn off the extension.. set flag to off
                 chrome.storage.local.set({'switch': "Off"});
                 sendResponse({message: "Extension turned Off"});
@@ -103,8 +103,8 @@ chrome.runtime.onMessage.addListener(
                 getStatus();
             }
         }
-        if (request.method == "autoSegment") {
-            if (request.value == true){
+        if (request.method === "autoSegment") {
+            if (request.value){
                 //turn on auto Segmentation
                 chrome.storage.local.set({'autoSegmentSwitch': "On"});
                 sendResponse({message: "Auto Segment turned On"});
@@ -123,8 +123,8 @@ chrome.runtime.onMessage.addListener(
                 getAutoSegment();
             }
         }
-        if (request.method == "paraBorder") {
-            if (request.value == true){
+        if (request.method === "paraBorder") {
+            if (request.value){
                 chrome.storage.local.set({'paraBorder': "On"});
                 sendResponse({message: "paraBorder turned Off"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -141,8 +141,8 @@ chrome.runtime.onMessage.addListener(
                 getParaBorder();
             }
         }
-        if (request.method == "doubleSpace") {
-            if (request.value == true){
+        if (request.method === "doubleSpace") {
+            if (request.value){
                 chrome.storage.local.set({'doubleSpace': "On"});
                 sendResponse({message: "doubleSpace turned On"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -159,8 +159,8 @@ chrome.runtime.onMessage.addListener(
                 getDoubleSpace();
             }
         }
-        if (request.method == "lineSeparator") {
-            if (request.value == true){
+        if (request.method === "lineSeparator") {
+            if (request.value){
                 chrome.storage.local.set({'lineSeparator': "On"});
                 sendResponse({message: "LineSeparator turned Off"});
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -177,22 +177,22 @@ chrome.runtime.onMessage.addListener(
                 getLineSeparator();
             }
         }
-        else if (request.method == "getStatus"){
+        else if (request.method === "getStatus"){
             sendResponse({message: mainSwitch});
         }
-        else if (request.method == "getParaBorder"){
+        else if (request.method === "getParaBorder"){
             sendResponse({message: paraBorder});
         }
-        else if (request.method == "getDoubleSpace"){
+        else if (request.method === "getDoubleSpace"){
             sendResponse({message: doubleSpace});
         }
-        else if (request.method == "getLineSeparator"){
+        else if (request.method === "getLineSeparator"){
             sendResponse({message: lineSeparator});
         }
-        else if (request.method == "getAutoSegment"){
+        else if (request.method === "getAutoSegment"){
             sendResponse({message: autoSegmentSwitch});
         }
-        else if (request.method == "segmentThisPage"){
+        else if (request.method === "segmentThisPage"){
             chrome.tabs.executeScript(null, {
                 code: "segmentSection('body');"
             });
