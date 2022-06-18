@@ -5,7 +5,6 @@ $(document).ready(function(){
         $("#doubleSpace").prop('checked', isOnMode);
     });
 
-
     $("#doubleSpace").change(function(){
         const current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "doubleSpace", value: current}, function(response) {

@@ -2,6 +2,7 @@
 var elem;
 var lineSeparator;
 var doubleSpace;
+
 $(document).ready(function() {
     var work = true;
     var border = false;
@@ -21,9 +22,10 @@ $(document).ready(function() {
         if (work == false) return;
         $(e.target).addClass("hoverActive");
         $(e.target).parent().addClass("hoverActiveParent");
-        if (border == true) $(e.target).parent().addClass("border");
-
+        if (border == true) 
+            $(e.target).parent().addClass("border");
     });
+
     $("body.work *").mouseleave(function () {
         if (work == false) return;
         $(".hoverActive").removeClass("hoverActive");
@@ -94,5 +96,3 @@ var segmentSection = function(which){
     });
     $("#pickMe").attr("id","");
 };
-
-

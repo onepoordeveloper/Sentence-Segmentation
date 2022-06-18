@@ -1,5 +1,3 @@
-
-
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
     chrome.storage.local.set({'switch': "On"});
@@ -7,10 +5,7 @@ chrome.runtime.onInstalled.addListener(function() {
     chrome.storage.local.set({'paraBorder': "Off"});
     chrome.storage.local.set({'lineSeparator': "Off"});
     chrome.storage.local.set({'doubleSpace': "Off"});
-
 });
-
-
 
 function onClickHandler(info, tab) {
     if (info.menuItemId === "segmentSection") {
@@ -26,12 +21,12 @@ function onClickHandler(info, tab) {
 
 chrome.contextMenus.onClicked.addListener(onClickHandler);
 
-
 var mainSwitch = "";
 var autoSegmentSwitch = "";
 var paraBorder = "";
 var lineSeparator = "";
 var doubleSpace = "";
+
 const getStatus = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.switch);
@@ -60,12 +55,14 @@ const getParaBorder = function(){
         paraBorder = resp.paraBorder;
     });
 };
+
 const getDoubleSpace = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.doubleSpace);
         doubleSpace = resp.doubleSpace;
     });
 };
+
 const getLineSeparator = function(){
     chrome.storage.local.get(null, function(resp){
         console.log(resp.lineSeparator);

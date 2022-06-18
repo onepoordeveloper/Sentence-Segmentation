@@ -7,6 +7,7 @@ $(document).ready(function(){
             $("#mainSwitch").prop('checked', false);
         }
     });
+
     chrome.runtime.sendMessage({method: "getAutoSegment"}, function(response) {
         if (response.message == "Off"){
             $("#autoSegment").prop('checked', false);
@@ -15,6 +16,7 @@ $(document).ready(function(){
             $("#autoSegment").prop('checked', true);
         }
     });
+
     chrome.runtime.sendMessage({method: "getParaBorder"}, function(response) {
         if (response.message == "Off"){
             $("#paragraphBorder").prop('checked', false);
@@ -23,6 +25,7 @@ $(document).ready(function(){
             $("#paragraphBorder").prop('checked', true);
         }
     });
+
     chrome.runtime.sendMessage({method: "getLineSeparator"}, function(response) {
         if (response.message == "Off"){
             $("#lineSeparator").prop('checked', false);
@@ -31,21 +34,25 @@ $(document).ready(function(){
             $("#lineSeparator").prop('checked', true);
         }
     });
+
     $("#mainSwitch").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "turnOff", value: current}, function(response) {
         });
     });
+
     $("#paragraphBorder").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "paraBorder", value: current}, function(response) {
         });
     });
+
     $("#lineSeparator").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "lineSeparator", value: current}, function(response) {
         });
     });
+
     $("#autoSegment").change(function(){
         var current = $(this).prop('checked');
         chrome.runtime.sendMessage({method: "autoSegment", value: current}, function(response) {
@@ -57,5 +64,4 @@ $(document).ready(function(){
             window.close();
         });
     })
-
 })
