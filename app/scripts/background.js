@@ -69,7 +69,7 @@ const getLineSeparator = function () {
     });
 };
 
-setTimeout(function () {
+setTimeout( () => {
     getStatus();
     getAutoSegment();
     getParaBorder();
