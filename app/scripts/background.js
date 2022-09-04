@@ -7,10 +7,7 @@ chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.local.set({ 'paraBorder': "Off" });
     chrome.storage.local.set({ 'lineSeparator': "Off" });
     chrome.storage.local.set({ 'doubleSpace': "Off" });
-
 });
-
-
 
 function onClickHandler(info, tab) {
     const part = info.menuItemId === "segmentSection" ? "section" : "body";
@@ -21,7 +18,6 @@ function onClickHandler(info, tab) {
 };
 
 chrome.contextMenus.onClicked.addListener(onClickHandler);
-
 
 var mainSwitch = "";
 var autoSegmentSwitch = "";
