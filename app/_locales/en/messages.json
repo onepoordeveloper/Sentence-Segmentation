@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Sentence Segmentation",
+    "message": "Better Sentence Segmentation",
     "description": "The name of the application"
   },
   "appDescription": {
-    "message": "My Chrome Extension",
+    "message": "Makes long paragraphs easier to read by putting each sentence on its own line.",
     "description": "The description of the application"
   }
 }
