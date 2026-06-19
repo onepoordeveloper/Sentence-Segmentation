@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Segmenter rich-text fixture</title>
+  <link rel="stylesheet" href="../app/styles/main.css">
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 70ch; }
+    .controls { position: sticky; top: 0; background: #fff; padding: .75rem 0;
+                border-bottom: 1px solid #ddd; margin-bottom: 1.5rem; }
+    .controls label { margin-right: 1rem; }
+    button { padding: .4rem .8rem; margin-right: .5rem; }
+    #results { margin: 1rem 0; padding: 1rem; border-radius: 6px; font-family: monospace; }
+    #results.pass { background: #e6ffed; border: 1px solid #34d058; }
+    #results.fail { background: #ffeef0; border: 1px solid #d73a49; }
+    #results li { margin: .25rem 0; }
+    .ok::before  { content: "✔ "; color: #22863a; }
+    .bad::before { content: "�’ "; color: #d73a49; }
+    blockquote { border-left: 3px solid #ccc; padding-left: 1rem; color: #444; }
+    code, pre { background: #f6f8fa; }
+    [contenteditable] { outline: 1px dashed #aaa; padding: .5rem; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label><input type="checkbox" id="lineSeparator"> Line separator</label>
+    <label><input type="checkbox" id="doubleSpace"> Double space</label>
+    <label><input type="checkbox" id="paraBorder"> Element border</label>
+    <button id="segment">Segment</button>
+    <button id="clear">Clear</button>
+    <button id="retest">Re-run self-test</button>
+  </div>
+
+  <ul id="results" aria-live="polite"></ul>
+
+  <!-- Everything that should be segmented or deliberately left alone lives here. -->
+  <main id="content">
+    <p>The <strong>U.S.</strong> economy is large. It keeps growing every year.</p>
+
+    <p>Rich inline markup: this is <em>one sentence with <a href="https://example.com/a.b. c">a link</a></em>. And here is another sentence. A third follows.</p>
+
+    <ol>
+      <li>First list item. It has two sentences.</li>
+      <li>10. looks like a marker but is text. Still one block.</li>
+    </ol>
+
+    <p>Honorifics and abbreviations: Mr. Smith met Dr. Jones at 3.14 p.m. They talked. Then they left.</p>
+
+    <blockquote>Nested quote. <span>With a <b>bold span. Inside it.</b></span> Done.</blockquote>
+
+    <p id="attr-test" title="This attribute has a period. It must stay intact.">Hover my title attribute; it contains a sentence boundary that must never be touched.</p>
+
+    <pre>Code block. Should NOT be segmented. for (i. j) {}</pre>
+    <p>Inline <code>obj. method(). chain()</code> code must stay intact too.</p>
+
+    <div contenteditable="true">Editable region. Should be skipped. Two sentences here.</div>
+
+    <table><tbody>
+      <tr><td>Cell one. Two sentences.</td><td>Cell two. Also two.</td></tr>
+    </tbody></table>
+
+    <script>window.__fixtureKeep = "Period. Space. Must survive.";</script>
+  </main>
+
+  <script src="../app/scripts/segmenter.js"></script>
+  <script>
+    const content = document.getElementById('content');
+    const original = content.innerHTML;          // pristine snapshot for reversibility checks
+    const titleBefore = document.getElementById('attr-test').getAttribute('title');
+    const scriptKept = window.__fixtureKeep;
+
+    function opts() {
+      return {
+        lineSeparator: document.getElementById('lineSeparator').checked,
+        doubleSpace: document.getElementById('doubleSpace').checked,
+        paraBorder: document.getElementById('paraBorder').checked,
+      };
+    }
+
+    function doSegment() {
+      Segmenter.clear(content);
+      Segmenter.segment(content, opts());
+    }
+    function doClear() { Segmenter.clear(content); }
+
+    // --- self test ---------------------------------------------------------
+    function selfTest() {
+      const checks = [];
+      const add = (name, pass, detail) => checks.push({ name, pass, detail });
+
+      // Start clean, then segment with default options.
+      Segmenter.clear(content);
+      Segmenter.segment(content, { lineSeparator: false, doubleSpace: false, paraBorder: false });
+
+      const breakCount = content.querySelectorAll('.ss-break').length;
+      add('inserts sentence breaks', breakCount > 0, breakCount + ' breaks');
+
+      // U.S. must not be split: no break should sit immediately after "U.S."
+      const html = content.innerHTML;
+      add('does not split "U.S."', !/U\.S\.\s*<span[^>]*ss-break/.test(html), '');
+
+      // Numbered "10." marker text must stay together (no break right after it).
+      add('does not split "10." marker', !/10\.\s*<span[^>]*ss-break/.test(html), '');
+
+      // <pre> / <code> / <script> / contenteditable must be untouched.
+      const preHasBreak = !!content.querySelector('pre .ss-break');
+      const codeHasBreak = !!content.querySelector('code .ss-break');
+      const editableHasBreak = !!content.querySelector('[contenteditable] .ss-break');
+      const scriptHasBreak = !!content.querySelector('script .ss-break');
+      add('skips <pre>', !preHasBreak, '');
+      add('skips inline <code>', !codeHasBreak, '');
+      add('skips contenteditable', !editableHasBreak, '');
+      add('skips <script>', !scriptHasBreak, '');
+
+      // Attribute containing ". " must be unchanged.
+      const titleNow = document.getElementById('attr-test').getAttribute('title');
+      add('leaves attribute values intact', titleNow === titleBefore, '');
+      add('leaves <script> contents intact', window.__fixtureKeep === scriptKept, '');
+
+      // Reversibility: clear() must restore the exact original markup.
+      Segmenter.clear(content);
+      add('clear() restores original HTML', content.innerHTML === original,
+          content.innerHTML === original ? '' : 'mismatch after clear');
+
+      render(checks);
+    }
+
+    function render(checks) {
+      const ul = document.getElementById('results');
+      const allPass = checks.every(c => c.pass);
+      ul.className = allPass ? 'pass' : 'fail';
+      ul.innerHTML = '';
+      const head = document.createElement('li');
+      head.textContent = (allPass ? 'ALL PASS — ' : 'FAILURES — ') + checks.length + ' checks';
+      head.style.fontWeight = 'bold';
+      ul.appendChild(head);
+      for (const c of checks) {
+        const li = document.createElement('li');
+        li.className = c.pass ? 'ok' : 'bad';
+        li.textContent = c.name + (c.detail ? '  (' + c.detail + ')' : '');
+        ul.appendChild(li);
+      }
+    }
+
+    document.getElementById('segment').addEventListener('click', doSegment);
+    document.getElementById('clear').addEventListener('click', doClear);
+    document.getElementById('retest').addEventListener('click', selfTest);
+    selfTest();
+  </script>
+</body>
+</html>

@@ -1,67 +1,92 @@
-$(document).ready(function () {
-    chrome.runtime.sendMessage({ method: "getStatus" }, function (response) {
-        if (response.message == "Off") {
-            $("#mainSwitch").prop('checked', true);
-        }
-        else if (response.message == "On") {
-            $("#mainSwitch").prop('checked', false);
-        }
-    });
+'use strict';
 
-    chrome.runtime.sendMessage({ method: "getAutoSegment" }, function (response) {
-        if (response.message == "Off") {
-            $("#autoSegment").prop('checked', false);
-        }
-        else if (response.message == "On") {
-            $("#autoSegment").prop('checked', true);
-        }
-    });
+// Popup controls. Reads and writes chrome.storage.local directly — the content
+// script reacts to storage changes, so no background round-trip is needed.
 
-    chrome.runtime.sendMessage({ method: "getParaBorder" }, function (response) {
-        if (response.message == "Off") {
-            $("#paragraphBorder").prop('checked', false);
-        }
-        else if (response.message == "On") {
-            $("#paragraphBorder").prop('checked', true);
-        }
-    });
+const DEFAULT_SETTINGS = {
+  enabled: true,
+  autoSegment: true,
+  lineSeparator: false,
+  doubleSpace: false,
+  paraBorder: false,
+};
 
-    chrome.runtime.sendMessage({ method: "getLineSeparator" }, function (response) {
-        if (response.message == "Off") {
-            $("#lineSeparator").prop('checked', false);
-        }
-        else if (response.message == "On") {
-            $("#lineSeparator").prop('checked', true);
-        }
-    });
+// Checkbox id -> setting key. mainSwitch is inverted: it reads "Turn Off", so a
+// checked box means segmentation is disabled.
+const TOGGLES = [
+  { id: 'mainSwitch', key: 'enabled', invert: true },
+  { id: 'autoSegment', key: 'autoSegment', invert: false },
+  { id: 'paragraphBorder', key: 'paraBorder', invert: false },
+  { id: 'lineSeparator', key: 'lineSeparator', invert: false },
+  { id: 'doubleSpace', key: 'doubleSpace', invert: false },
+];
 
-    $("#mainSwitch").change(function () {
-        var current = $(this).prop('checked');
-        chrome.runtime.sendMessage({ method: "turnOff", value: current }, function (response) {
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.storage.local.get(DEFAULT_SETTINGS, (settings) => {
+    for (const { id, key, invert } of TOGGLES) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.checked = invert ? !settings[key] : Boolean(settings[key]);
+      el.addEventListener('change', () => {
+        const value = invert ? !el.checked : el.checked;
+        chrome.storage.local.set({ [key]: value });
+      });
+    }
+  });
+
+  const segmentButton = document.getElementById('segmentThisPage');
+  if (segmentButton) {
+    segmentButton.addEventListener('click', () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tab = tabs[0];
+        if (tab && tab.id != null) {
+          chrome.tabs.sendMessage(tab.id, { method: 'segmentNow' });
+        }
+        window.close();
+      });
+    });
+  }
+
+  setupIgnoreControl();
+});
+
+// Per-site ignore: adds/removes the active tab's hostname from `ignoredSites`.
+function setupIgnoreControl() {
+  const checkbox = document.getElementById('ignoreSite');
+  const label = document.getElementById('ignoreLabel');
+  if (!checkbox) return;
+
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    let host = '';
+    try {
+      host = tab && tab.url ? new URL(tab.url).hostname : '';
+    } catch (e) {
+      host = '';
+    }
+
+    // chrome://, about:, extension pages, etc. have no host to ignore.
+    if (!host) {
+      checkbox.disabled = true;
+      if (label) label.textContent = 'Ignore site (unavailable here)';
+      return;
+    }
+
+    if (label) label.textContent = `Don't auto-segment ${host}`;
+
+    chrome.storage.local.get({ ignoredSites: [] }, ({ ignoredSites }) => {
+      checkbox.checked = ignoredSites.includes(host);
+      checkbox.addEventListener('change', () => {
+        chrome.storage.local.get({ ignoredSites: [] }, (current) => {
+          const sites = new Set(current.ignoredSites);
+          if (checkbox.checked) {
+            sites.add(host);
+          } else {
+            sites.delete(host);
+          }
+          chrome.storage.local.set({ ignoredSites: Array.from(sites) });
         });
+      });
     });
-
-    $("#paragraphBorder").change(function () {
-        var current = $(this).prop('checked');
-        chrome.runtime.sendMessage({ method: "paraBorder", value: current }, function (response) {
-        });
-    });
-
-    $("#lineSeparator").change(function () {
-        var current = $(this).prop('checked');
-        chrome.runtime.sendMessage({ method: "lineSeparator", value: current }, function (response) {
-        });
-    });
-
-    $("#autoSegment").change(function () {
-        var current = $(this).prop('checked');
-        chrome.runtime.sendMessage({ method: "autoSegment", value: current }, function (response) {
-        });
-    })
-
-    $("#segmentThisPage").click(function () {
-        chrome.runtime.sendMessage({ method: "segmentThisPage" }, function (response) {
-            window.close();
-        });
-    })
-})
+  });
+}

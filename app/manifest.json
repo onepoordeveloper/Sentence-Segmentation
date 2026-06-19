@@ -1,24 +1,23 @@
 {
-  "name": "Sentence Segmenter",
-  "short_name": "Sentence Segmenter",
-  "version": "1.6.4",
-  "manifest_version": 2,
+  "name": "Better Sentence Segmentation",
+  "short_name": "Better Segment",
+  "version": "2.0.0",
+  "manifest_version": 3,
   "description": "This extension will make your text easily readable by separating sentences based on periods.",
   "icons": {
     "128": "images/icon-128.png"
   },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
-  },
   "default_locale": "en",
   "permissions": [
-    "http://*/*",
-    "https://*/*",
     "contextMenus",
     "storage"
   ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "background": {
+    "service_worker": "scripts/background.js",
     "scripts": [
       "scripts/background.js"
     ]
@@ -30,17 +29,26 @@
         "https://*/*"
       ],
       "js": [
-        "scripts/script.js",
+        "scripts/segmenter.js",
         "scripts/contentscript.js"
       ],
-      "css":[
+      "css": [
         "styles/main.css"
       ],
       "run_at": "document_end",
       "all_frames": false
     }
   ],
-  "browser_action": {
-    "default_title": "Sentence Segmentation"
+  "action": {
+    "default_title": "Better Sentence Segmentation",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "better-sentence-segmentation@onepoordeveloper.github.io",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
   }
 }

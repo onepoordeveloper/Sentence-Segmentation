@@ -1,5 +1,7 @@
-.hoverActiveParent.border{
-    outline: 3px solid yellow !important;
+/* "Turn On Element border": outline blocks that contain segmented sentences. */
+.ss-bordered{
+    outline: 1px solid #dedede !important;
+    outline-offset: 2px !important;
 }
 
 #SentenceSegmentationPopup{
