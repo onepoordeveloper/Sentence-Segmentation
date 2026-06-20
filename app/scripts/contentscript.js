@@ -58,9 +58,47 @@ function applySegmentation(settings) {
   });
 }
 
+// The extension context dies when the extension is reloaded, updated, or
+// disabled while this content script is still injected in an open tab. Any
+// chrome.* call from the orphaned script then throws "Extension context
+// invalidated". We detect that and shut down quietly instead of erroring.
+let extensionAlive = true;
+
+function isContextValid() {
+  try {
+    return Boolean(chrome.runtime && chrome.runtime.id);
+  } catch (e) {
+    return false;
+  }
+}
+
+function shutdown() {
+  if (!extensionAlive) return;
+  extensionAlive = false;
+  stopAutoObserver();
+}
+
 function readSettings() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(DEFAULT_SETTINGS, resolve);
+    if (!extensionAlive || !isContextValid()) {
+      shutdown();
+      return; // leave the promise unresolved; nothing further runs
+    }
+    try {
+      chrome.storage.local.get(DEFAULT_SETTINGS, (result) => {
+        try {
+          if (chrome.runtime.lastError) {
+            shutdown();
+            return;
+          }
+          resolve(result);
+        } catch (e) {
+          shutdown();
+        }
+      });
+    } catch (e) {
+      shutdown();
+    }
   });
 }
 
@@ -89,11 +127,17 @@ function topLevelNodes(nodes) {
     !nodes.some((other) => other !== n && other.nodeType === 1 && other.contains(n)));
 }
 
+// Above this batch size we skip the O(n^2) containment dedup — segmentNode is
+// idempotent, so processing an overlapping subtree twice is safe, just wasteful.
+// This keeps high-churn pages (streaming consoles, live feeds) from stalling.
+const DEDUP_MAX_BATCH = 50;
+
 function flushPending() {
   flushTimer = null;
-  const nodes = topLevelNodes(pendingNodes.filter((n) => n.isConnected));
+  let nodes = pendingNodes.filter((n) => n.isConnected);
   pendingNodes = [];
   if (!nodes.length) return;
+  if (nodes.length <= DEDUP_MAX_BATCH) nodes = topLevelNodes(nodes);
 
   readSettings().then((settings) => {
     if (!settings.enabled || !settings.autoSegment || isIgnored(settings)) return;

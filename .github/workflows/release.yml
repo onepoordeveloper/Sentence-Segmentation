@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run tests
+        run: node --test test/segmenter.test.js
+
+      - name: Verify manifest version matches tag
+        run: |
+          manifest_version=$(node -p "require('./app/manifest.json').version")
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$manifest_version" != "$tag_version" ]; then
+            echo "::error::manifest version ($manifest_version) does not match tag ($tag_version)"
+            exit 1
+          fi
+          echo "version $manifest_version matches tag"
+
+      - name: Build store packages
+        run: node build.mjs
+
+      - name: Extract changelog notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" { grab = 1; next }
+            grab && /^## \[/ { exit }
+            grab { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          echo "----- release notes -----"
+          cat RELEASE_NOTES.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Better Sentence Segmentation ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+          files: dist/*.zip
