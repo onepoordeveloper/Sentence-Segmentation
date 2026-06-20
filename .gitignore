@@ -3,3 +3,5 @@
 .DS_Store
 packages
 dist
+# Store-listing screenshots / sources (not part of the extension)
+/images/
