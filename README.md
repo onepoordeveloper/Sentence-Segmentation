@@ -4,7 +4,10 @@ The upgraded successor to the original **Sentence Segmenter** extension
 ([original listing](https://chromewebstore.google.com/detail/sentence-segmenter/jfbhkblbhhigbgdnijncccdndhbflcha)).
 Same idea, rebuilt: a Manifest V3 rewrite with smarter sentence detection and instant, reversible segmentation.
 
-Chrome Web Store: _(new listing — link to be added after publishing)_
+**Install:**
+[Chrome Web Store](https://chromewebstore.google.com/detail/better-sentence-segmentat/bnmdpggjghbahmdkbamnnlepomdbmjek)
+·
+[Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/better-sentence-segmentation)
 
 This extension can help make your text easier to read by putting each sentence of a webpage on a new line (separated based on periods).
 
